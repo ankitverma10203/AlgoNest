@@ -123,20 +123,27 @@
       return response.json();
     }).then(function (repositories) {
       if (!repositories.length) throw new Error('No repositories are available for this account.');
-      repositoryField.replaceChildren.apply(repositoryField, repositories.map(function (repository) {
+      var savedRepository = repositories.find(function (item) {
+        return item.full_name === selectedRepository;
+      });
+      var options = [new Option('Select a repository', '')].concat(repositories.map(function (repository) {
         var option = document.createElement('option');
         option.value = repository.full_name;
         option.textContent = repository.full_name;
         return option;
       }));
-      var repository = repositories.find(function (item) {
-        return item.full_name === selectedRepository;
-      }) || repositories[0];
-      repositoryField.value = repository.full_name;
+      repositoryField.replaceChildren.apply(repositoryField, options);
+      repositoryField.value = savedRepository ? savedRepository.full_name : '';
       repositoryField.disabled = false;
+      if (!savedRepository) {
+        branchField.replaceChildren(new Option('Select a repository first', ''));
+        branchField.value = '';
+        branchField.disabled = true;
+        return chrome.storage.local.remove(['githubOwner', 'githubRepo', 'githubBranch']);
+      }
       return chrome.storage.local.set({
-        githubOwner: repository.owner.login,
-        githubRepo: repository.name
+        githubOwner: savedRepository.owner.login,
+        githubRepo: savedRepository.name
       }).then(function () {
         return loadBranches(selectedBranch);
       });
@@ -255,6 +262,15 @@
   });
 
   repositoryField.addEventListener('change', function () {
+    if (!repositoryField.value) {
+      branchField.replaceChildren(new Option('Select a repository first', ''));
+      branchField.value = '';
+      branchField.disabled = true;
+      chrome.storage.local.remove(['githubOwner', 'githubRepo', 'githubBranch'])
+        .then(updateSaveButton)
+        .catch(function (error) { setStatus(error.message); });
+      return;
+    }
     var parts = repositoryField.value.split('/');
     repositoryField.disabled = true;
     branchField.disabled = true;

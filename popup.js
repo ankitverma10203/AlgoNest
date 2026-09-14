@@ -14,14 +14,22 @@
     githubToken: '',
     githubOwner: '',
     githubRepo: '',
-    githubBranch: 'main'
+    githubBranch: ''
   }).then(function (settings) {
-    var connected = Boolean(settings.githubToken && settings.githubOwner && settings.githubRepo);
-    setConnected(connected);
+    var authenticated = Boolean(settings.githubToken);
+    var destinationConfigured = Boolean(settings.githubOwner && settings.githubRepo && settings.githubBranch);
+    setConnected(authenticated);
 
-    if (connected) {
+    if (authenticated && destinationConfigured) {
       status.textContent = 'GitHub connected';
       destination.textContent = settings.githubOwner + '/' + settings.githubRepo + ' · ' + settings.githubBranch;
+      button.textContent = 'Manage settings';
+      return;
+    }
+
+    if (authenticated) {
+      status.textContent = 'GitHub connected';
+      destination.textContent = 'Select a repository and branch in settings.';
       button.textContent = 'Manage settings';
       return;
     }
