@@ -47,7 +47,11 @@ AlgoNest uses GitHub OAuth device flow.
 1. Open `options.js`.
 2. Replace the value of `GITHUB_OAUTH_CLIENT_ID` with your OAuth App client ID.
 3. Reload AlgoNest from `chrome://extensions`.
-4. Open the extension options page.
+4. Open the extension options page:
+   - Go to `chrome://extensions`.
+   - Find **AlgoNest** and click **Details**.
+   - Click **Extension options**.
+   - Alternatively, right-click the AlgoNest toolbar icon and choose **Options**.
 5. Click **Sign in with GitHub**.
 6. Follow the GitHub device-flow instructions in the new tab.
 7. Approve the requested `repo` scope.
@@ -76,7 +80,7 @@ Files are written using this layout:
 
 ```text
 YYYY-MM-DD/problem-slug/submission-id.extension
-YYYY-MM-DD/problem-slug/problem.md
+YYYY-MM-DD/problem-slug/README.md
 ```
 
 For example:
@@ -87,7 +91,7 @@ For example:
 
 The folder is the problem slug from the LeetCode URL, such as `/problems/two-sum/`. If the language cannot be detected, the file is created without an extension.
 
-`problem.md` is created once per problem folder and links to the corresponding LeetCode problem.
+`README.md` is created once per problem folder. It includes the title, direct LeetCode link, slug, and language of the first saved solution. GitHub renders it automatically when you open that folder.
 
 ## Supported languages
 

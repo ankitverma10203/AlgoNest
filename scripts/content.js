@@ -69,6 +69,14 @@
     return match ? match[1] : '';
   }
 
+  function readProblemTitle(problemSlug) {
+    var title = document.querySelector('meta[property="og:title"]');
+    var value = title ? title.getAttribute('content') : document.title;
+    return String(value || problemSlug || '')
+      .replace(/\s*[-|]\s*LeetCode\s*$/i, '')
+      .trim() || problemSlug;
+  }
+
   function readLanguageFromPage() {
     var languages = globalThis.AlgoNestLanguageConfig || [];
     var elements = document.querySelectorAll(
@@ -123,6 +131,7 @@
     statusCheckAttempts = 0;
 
     var problemSlug = readProblemSlug();
+    var problemTitle = readProblemTitle(problemSlug);
     var language = readLanguageFromPage();
     var submissionKey = problemSlug + '|' + status + '|' + code;
     if (submissionKey === lastSubmissionKey) {
@@ -134,6 +143,7 @@
     var payload = {
       submissionId: String(Date.now()),
       problemSlug: problemSlug,
+      problemTitle: problemTitle,
       problemUrl: window.location.origin + '/problems/' + problemSlug + '/',
       code: code,
       language: language,

@@ -47,7 +47,23 @@ importScripts('language-config.js');
   }
 
   function buildProblemFile(path) {
-    return path.slice(0, path.lastIndexOf('/') + 1) + 'problem.md';
+    return path.slice(0, path.lastIndexOf('/') + 1) + 'README.md';
+  }
+
+  function buildProblemReadme(submission) {
+    var title = String(submission.problemTitle || submission.problemSlug || 'LeetCode Problem').trim();
+    var slug = String(submission.problemSlug || 'unknown').trim();
+    var url = submission.problemUrl || 'https://leetcode.com/problems/' + encodeURIComponent(slug) + '/';
+    var language = String(submission.language || 'Unknown').trim();
+
+    return [
+      '# ' + title,
+      '',
+      '- **LeetCode:** [' + title + '](' + url + ')',
+      '- **Slug:** `' + slug + '`',
+      '- **First saved solution language:** ' + language,
+      ''
+    ].join('\n');
   }
 
   function writeFile(endpoint, headers, body) {
@@ -123,11 +139,9 @@ importScripts('language-config.js');
       return fetch(problemEndpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers })
         .then(function (response) {
           if (response.status === 404) {
-            var problemUrl = submission.problemUrl ||
-              'https://leetcode.com/problems/' + encodeURIComponent(submission.problemSlug || '') + '/';
             return writeFile(problemEndpoint, headers, {
               message: 'Add ' + problemFile,
-              content: encodeContent('[LeetCode problem](' + problemUrl + ')\n'),
+              content: encodeContent(buildProblemReadme(submission)),
               branch: settings.githubBranch
             });
           }
