@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlgoNest</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="panel">
+    <p class="eyebrow">ALGONEST</p>
+    <h1>Send accepted solutions home.</h1>
+    <p class="intro">Connect a GitHub repository. New submissions will land in date and problem folders automatically.</p>
+    <form id="settings-form">
+      <fieldset>
+        <legend>GitHub destination</legend>
+        <label>Repository<select name="githubRepo" required disabled><option value="">Sign in to load repositories</option></select></label>
+        <label>Branch<select name="githubBranch" required disabled><option value="">Select a repository first</option></select></label>
+      </fieldset>
+      <label class="check"><input name="commitOnlyAccepted" type="checkbox"> Commit only accepted submissions</label>
+      <button id="github-auth" type="button">Sign in with GitHub</button>
+      <p id="status" role="status"></p>
+    </form>
+    <p class="note">Sign-in happens on GitHub. The extension stores the access credential locally and sends it only to GitHub's API.</p>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
