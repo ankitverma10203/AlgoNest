@@ -43,7 +43,7 @@ The extension already includes AlgoNest's public GitHub OAuth client ID. You do 
    - Click **Extension options**.
    - Alternatively, right-click the AlgoNest toolbar icon and choose **Options**.
 3. Click **Sign in with GitHub**.
-4. Follow the GitHub device-flow instructions in the new tab.
+4. Enter the temporary verification code shown on the options page in the GitHub tab that opens.
 5. Approve the requested `repo` scope.
 6. Select the destination repository and branch.
 

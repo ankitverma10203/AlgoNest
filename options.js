@@ -12,12 +12,18 @@
   var form = document.getElementById('settings-form');
   var status = document.getElementById('status');
   var authButton = document.getElementById('github-auth');
+  var verificationCode = document.getElementById('verification-code');
   var repositoryField = form.elements.githubRepo;
   var branchField = form.elements.githubBranch;
   var destinationFieldset = form.querySelector('fieldset');
 
   function setStatus(message) {
     status.textContent = message;
+  }
+
+  function setVerificationCode(code) {
+    verificationCode.hidden = !code;
+    verificationCode.querySelector('code').textContent = code || '';
   }
 
   function updateAuthUi(isSignedIn) {
@@ -130,7 +136,8 @@
       scope: 'repo'
     }).then(function (device) {
       return chrome.tabs.create({ url: device.verification_uri }).then(function () {
-        setStatus('Enter ' + device.user_code + ' on GitHub to approve AlgoNest.');
+        setVerificationCode(device.user_code);
+        setStatus('Enter the verification code above on GitHub to approve AlgoNest.');
         var interval = Math.max(Number(device.interval) || 5, 5) * 1000;
         var attempts = 0;
 
@@ -157,6 +164,7 @@
         });
       });
     }).then(function (tokenResponse) {
+      setVerificationCode('');
       return chrome.storage.local.set({ githubToken: tokenResponse.access_token });
     });
   }
@@ -181,6 +189,7 @@
 
   authButton.addEventListener('click', function () {
     authButton.disabled = true;
+    setVerificationCode('');
     setStatus('Opening GitHub sign-in...');
     authenticateWithGitHub()
       .then(function () {
@@ -189,7 +198,10 @@
         return loadRepositories(repositoryField.value, branchField.value);
       })
       .then(function () { setStatus('Connected to GitHub. Choose a repository and branch.'); })
-      .catch(function (error) { setStatus(error.message); })
+      .catch(function (error) {
+        setVerificationCode('');
+        setStatus(error.message);
+      })
       .then(function () { authButton.disabled = false; });
   });
 

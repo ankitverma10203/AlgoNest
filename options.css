@@ -34,4 +34,7 @@ button { margin-top: 8px; padding: 12px 18px; border: 0; border-radius: 3px; col
 button:hover { background: var(--accent-dark); }
 button:disabled, select:disabled { cursor: wait; opacity: .65; }
 #status { min-height: 1.5em; color: var(--accent-dark); }
+.auth-help { margin: 18px 0 0; color: var(--muted); font: 13px/1.45 Arial, sans-serif; }
+.verification-code { margin: 18px 0 0; padding: 12px; border-left: 4px solid var(--accent); background: rgba(216, 91, 63, .08); color: var(--ink); font: 14px/1.45 Arial, sans-serif; }
+.verification-code code { display: inline-block; margin-left: 4px; padding: 2px 6px; border-radius: 3px; background: rgba(21, 33, 43, .08); color: var(--ink); font-weight: 700; letter-spacing: .08em; }
 .note { color: var(--muted); font: 12px/1.4 Arial, sans-serif; }

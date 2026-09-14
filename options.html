@@ -21,7 +21,9 @@
         <label>Branch<select name="githubBranch" required disabled><option value="">Select a repository first</option></select></label>
       </fieldset>
       <label class="check"><input name="commitOnlyAccepted" type="checkbox"> Commit only accepted submissions</label>
+      <p class="auth-help">GitHub OAuth is already configured. After you click sign in, enter the temporary verification code shown here in the GitHub tab that opens.</p>
       <button id="github-auth" type="button">Sign in with GitHub</button>
+      <p id="verification-code" class="verification-code" hidden>Enter this code on GitHub: <code></code></p>
       <p id="status" role="status"></p>
     </form>
     <p class="note">Sign-in happens on GitHub. The extension stores the access credential locally and sends it only to GitHub's API.</p>
