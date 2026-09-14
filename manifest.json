@@ -12,9 +12,19 @@
 	"background": {
 		"service_worker": "scripts/background.js"
 	},
+	"icons": {
+		"16": "images/icon.png",
+		"48": "images/icon.png",
+		"128": "images/icon.png"
+	},
 	"action": {
 		"default_title": "AlgoNest",
-		"default_popup": "options.html"
+		"default_popup": "options.html",
+		"default_icon": {
+			"16": "images/icon.png",
+			"48": "images/icon.png",
+			"128": "images/icon.png"
+		}
 	},
 	"options_page": "options.html",
 	"content_scripts": [

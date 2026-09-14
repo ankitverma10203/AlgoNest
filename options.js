@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var GITHUB_OAUTH_CLIENT_ID = 'REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID';
+  var GITHUB_OAUTH_CLIENT_ID = 'Ov23liyQqCVHkVgyEBGu';
   var defaults = {
     githubRepo: '',
     githubOwner: '',
@@ -14,9 +14,19 @@
   var authButton = document.getElementById('github-auth');
   var repositoryField = form.elements.githubRepo;
   var branchField = form.elements.githubBranch;
+  var destinationFieldset = form.querySelector('fieldset');
 
   function setStatus(message) {
     status.textContent = message;
+  }
+
+  function updateAuthUi(isSignedIn) {
+    authButton.hidden = isSignedIn;
+    if (destinationFieldset) {
+      destinationFieldset.hidden = !isSignedIn;
+    }
+    repositoryField.disabled = !isSignedIn;
+    branchField.disabled = !isSignedIn;
   }
 
   function postForm(url, values) {
@@ -40,11 +50,11 @@
   }
 
   function loadBranches(selectedBranch) {
-    var owner = form.elements.githubOwner.value.trim();
-    var repo = form.elements.githubRepo.value.trim();
-    return chrome.storage.local.get({ githubToken: '' }).then(function (settings) {
+    return chrome.storage.local.get({ githubToken: '', githubOwner: '', githubRepo: '' }).then(function (settings) {
+      var owner = (settings.githubOwner || '').trim();
+      var repo = (settings.githubRepo || '').trim();
       if (!owner || !repo || !settings.githubToken) {
-        throw new Error('Sign in and enter the repository owner and name first.');
+        throw new Error('Sign in and select a repository first.');
       }
       return fetch('https://api.github.com/repos/' + encodeURIComponent(owner) + '/' +
         encodeURIComponent(repo) + '/branches?per_page=100', {
@@ -158,9 +168,13 @@
       if (field.type === 'checkbox') field.checked = settings[key];
       else field.value = settings[key];
     });
+    updateAuthUi(Boolean(settings.githubToken));
     if (settings.githubToken) {
       setStatus('Connected to GitHub. Loading repositories...');
       loadRepositories(settings.githubOwner + '/' + settings.githubRepo, settings.githubBranch)
+        .then(function () {
+          setStatus('Connected to GitHub. Choose a repository and branch.');
+        })
         .catch(function (error) { setStatus(error.message); });
     }
   });
@@ -169,8 +183,11 @@
     authButton.disabled = true;
     setStatus('Opening GitHub sign-in...');
     authenticateWithGitHub()
-      .then(function () { setStatus('Connected to GitHub. Loading repositories...'); })
-      .then(function () { return loadRepositories(repositoryField.value, branchField.value); })
+      .then(function () {
+        updateAuthUi(true);
+        setStatus('Connected to GitHub. Loading repositories...');
+        return loadRepositories(repositoryField.value, branchField.value);
+      })
       .then(function () { setStatus('Connected to GitHub. Choose a repository and branch.'); })
       .catch(function (error) { setStatus(error.message); })
       .then(function () { authButton.disabled = false; });

@@ -48,7 +48,7 @@
   function notify(title, message) {
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'images/icon.svg',
+      iconUrl: 'images/icon.png',
       title: title,
       message: message
     });

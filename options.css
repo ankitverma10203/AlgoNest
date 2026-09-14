@@ -15,11 +15,13 @@ body {
   min-width: 340px;
   min-height: 100vh;
   color: var(--ink);
-  background: radial-gradient(circle at 85% 10%, #f1c7a8 0, transparent 32%), var(--paper);
+  background: var(--paper);
   font: 15px/1.5 Georgia, 'Times New Roman', serif;
 }
 
 .panel { width: min(100% - 40px, 560px); margin: 0 auto; padding: 48px 0; }
+.brand { display: flex; align-items: center; margin-bottom: 18px; }
+.logo { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 10px 24px rgba(21, 33, 43, 0.12); }
 .eyebrow { margin: 0 0 12px; color: var(--accent-dark); font: 700 11px/1.2 Arial, sans-serif; letter-spacing: 2px; }
 h1 { max-width: 460px; margin: 0; font-size: clamp(32px, 7vw, 54px); line-height: .98; font-weight: 400; }
 .intro { max-width: 470px; margin: 18px 0 30px; color: var(--muted); font-size: 17px; }
