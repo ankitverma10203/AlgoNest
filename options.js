@@ -14,11 +14,14 @@
   var authButton = document.getElementById('github-auth');
   var saveButton = document.getElementById('save-settings');
   var logoutButton = document.getElementById('github-logout');
+  var authActionButton = document.getElementById('auth-action');
   var authHelp = document.getElementById('auth-help');
   var verificationCode = document.getElementById('verification-code');
   var repositoryField = form.elements.githubRepo;
   var branchField = form.elements.githubBranch;
   var destinationFieldset = form.querySelector('fieldset');
+  var verificationUri = '';
+  var verificationUserCode = '';
 
   function updateSaveButton() {
     saveButton.disabled = !repositoryField.value || !branchField.value;
@@ -29,8 +32,10 @@
   }
 
   function setVerificationCode(code) {
+    verificationUserCode = code || '';
     verificationCode.hidden = !code;
     verificationCode.querySelector('code').textContent = code || '';
+    authActionButton.disabled = !code || !verificationUri;
   }
 
   function updateAuthUi(isSignedIn) {
@@ -146,37 +151,36 @@
       client_id: GITHUB_OAUTH_CLIENT_ID,
       scope: 'repo'
     }).then(function (device) {
-      return chrome.tabs.create({ url: device.verification_uri }).then(function () {
-        setVerificationCode(device.user_code);
-        chrome.runtime.sendMessage({ type: 'github-auth-code', code: device.user_code });
-        setStatus('Enter the verification code above on GitHub to approve AlgoNest.');
-        var interval = Math.max(Number(device.interval) || 5, 5) * 1000;
-        var attempts = 0;
+      verificationUri = device.verification_uri;
+      setVerificationCode(device.user_code);
+      setStatus('Copy the code and open GitHub to approve AlgoNest.');
+      var interval = Math.max(Number(device.interval) || 5, 5) * 1000;
+      var attempts = 0;
 
-        return new Promise(function (resolve, reject) {
-          function poll() {
-            attempts += 1;
-            if (attempts > 120) {
-              reject(new Error('GitHub sign-in timed out.'));
+      return new Promise(function (resolve, reject) {
+        function poll() {
+          attempts += 1;
+          if (attempts > 120) {
+            reject(new Error('GitHub sign-in timed out.'));
+            return;
+          }
+          postForm('https://github.com/login/oauth/access_token', {
+            client_id: GITHUB_OAUTH_CLIENT_ID,
+            device_code: device.device_code,
+            grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+          }).then(resolve).catch(function (error) {
+            if (error.code === 'authorization_pending' || error.code === 'slow_down') {
+              setTimeout(poll, error.code === 'slow_down' ? interval + 5000 : interval);
               return;
             }
-            postForm('https://github.com/login/oauth/access_token', {
-              client_id: GITHUB_OAUTH_CLIENT_ID,
-              device_code: device.device_code,
-              grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
-            }).then(resolve).catch(function (error) {
-              if (error.code === 'authorization_pending' || error.code === 'slow_down') {
-                setTimeout(poll, error.code === 'slow_down' ? interval + 5000 : interval);
-                return;
-              }
-              reject(error);
-            });
-          }
-          setTimeout(poll, interval);
-        });
+            reject(error);
+          });
+        }
+        setTimeout(poll, interval);
       });
     }).then(function (tokenResponse) {
       setVerificationCode('');
+      verificationUri = '';
       return chrome.storage.local.set({ githubToken: tokenResponse.access_token });
     });
   }
@@ -229,10 +233,25 @@
         branchField.replaceChildren(new Option('Select a repository first', ''));
         updateAuthUi(false);
         setVerificationCode('');
+        verificationUri = '';
         setStatus('GitHub disconnected from AlgoNest.');
       })
       .catch(function (error) { setStatus(error.message); })
       .then(function () { logoutButton.disabled = false; });
+  });
+
+  authActionButton.addEventListener('click', function () {
+    if (!verificationUri) return;
+    Promise.resolve().then(function () {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable.');
+      return navigator.clipboard.writeText(verificationUserCode);
+    }).then(function () {
+      setStatus('Verification code copied. Enter it on GitHub.');
+    }).catch(function () {
+      setStatus('GitHub opened. Select the code and copy it manually.');
+    }).then(function () {
+      return chrome.tabs.create({ url: verificationUri });
+    });
   });
 
   repositoryField.addEventListener('change', function () {

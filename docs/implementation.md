@@ -30,7 +30,7 @@ Options page → GitHub device authorization → local extension storage
 
 1. The user clicks **Sign in with GitHub** in the options page.
 2. `options.js` requests a GitHub device code using the extension's public OAuth client ID and the `repo` scope.
-3. GitHub returns a verification URL, a temporary user code, a temporary device code, and a polling interval. The extension opens the verification URL and displays the user code in the options page.
+3. GitHub returns a verification URL, a temporary user code, a temporary device code, and a polling interval. The extension displays the user code in the options page and provides Copy code and Open GitHub controls.
 4. The user signs in directly on GitHub and enters the displayed code. AlgoNest never receives the user's GitHub password.
 5. The extension polls GitHub until authorization succeeds, then stores the returned access token in `chrome.storage.local`.
 6. It uses that token to fetch repositories and branches. Selecting a repository stores its owner and name locally; changing the branch stores the selected branch and updates the options-page status after persistence succeeds.

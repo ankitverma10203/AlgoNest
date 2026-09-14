@@ -48,7 +48,11 @@ button:hover { background: var(--accent-hover); }
 button:disabled, select:disabled { cursor: wait; opacity: .65; }
 #status { min-height: 1.5em; margin: 16px 2px 0; color: #ffc6b8; font-size: 13px; }
 .verification-code { margin: 18px 0 0; padding: 13px 14px; border: 1px solid rgba(255, 123, 92, .4); border-radius: 11px; background: rgba(255, 123, 92, .1); color: var(--ink); font-size: 13px; }
-.verification-code code { display: inline-block; margin-left: 5px; padding: 2px 7px; border-radius: 5px; background: rgba(255,255,255,.12); font-weight: 800; letter-spacing: .1em; }
+.verification-code p { margin: 0 0 8px; text-align: center; }
+.verification-row { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; }
+.verification-code code { display: inline-block; flex: 0 0 auto; padding: 5px 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 6px; background: rgba(255,255,255,.12); font-size: 17px; font-weight: 800; letter-spacing: .14em; }
+.verification-actions { display: flex; }
+.verification-actions button { min-height: 34px; padding: 7px 12px; font-size: 12px; white-space: nowrap; }
 .note { margin: 20px 4px 0; color: var(--muted); font-size: 12px; }
 .footer { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 24px 4px 0; color: var(--muted); font-size: 12px; }
 .footer a { color: var(--ink); text-decoration: none; }
@@ -61,4 +65,5 @@ button:disabled, select:disabled { cursor: wait; opacity: .65; }
   .brand { width: 62px; height: 62px; border-radius: 18px; }
   .logo { width: 48px; height: 48px; }
   form { padding: 16px; }
+  .verification-row { gap: 10px; }
 }
