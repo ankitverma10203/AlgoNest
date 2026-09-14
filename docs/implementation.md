@@ -17,6 +17,8 @@ Options page → GitHub device authorization → local extension storage
 | `options.html` | Contains the GitHub sign-in, temporary verification-code display, repository selector, branch selector, and accepted-only setting. |
 | `options.css` | Styles the options page. |
 | `options.js` | Runs GitHub OAuth device authorization, displays the temporary user code, stores the access token locally, loads repositories and branches, and saves the selected destination. |
+| `popup.html` / `popup.js` | Shows the current GitHub connection and selected destination, then opens the persistent options page for setup or changes. |
+| `popup.css` | Styles the compact extension popup. |
 | `scripts/language-config.js` | Defines the shared language-alias-to-file-extension mapping. |
 | `scripts/site-adapters.js` | Confirms that the active page is LeetCode and exposes general site-adapter helpers. Its `parseSubmission()` helper is reserved for a future API/message-based flow and is not used by the current DOM-capture flow. |
 | `scripts/content.js` | Runs on LeetCode, detects Submit, reads the rendered code/result/title/language, derives the problem slug from the URL, prevents duplicates, and sends the submission to the background service worker. |
@@ -31,7 +33,7 @@ Options page → GitHub device authorization → local extension storage
 3. GitHub returns a verification URL, a temporary user code, a temporary device code, and a polling interval. The extension opens the verification URL and displays the user code in the options page.
 4. The user signs in directly on GitHub and enters the displayed code. AlgoNest never receives the user's GitHub password.
 5. The extension polls GitHub until authorization succeeds, then stores the returned access token in `chrome.storage.local`.
-6. It uses that token to fetch repositories and branches. Selecting a repository stores its owner, name, and selected branch locally.
+6. It uses that token to fetch repositories and branches. Selecting a repository stores its owner and name locally; changing the branch stores the selected branch and updates the options-page status after persistence succeeds.
 
 The token belongs to the GitHub account that approved the device code. The selected repository may be owned by the user or by an organization the user can access. The requested `repo` scope is broader than the one repository selected in AlgoNest; the extension itself writes only to the selected repository.
 

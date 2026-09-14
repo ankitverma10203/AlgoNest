@@ -8,21 +8,29 @@
 </head>
 <body>
   <main class="panel">
-    <div class="brand" aria-label="AlgoNest logo">
-      <img src="images/icon.png" alt="AlgoNest logo" class="logo">
-    </div>
-    <p class="eyebrow">ALGONEST</p>
-    <h1>Commit accepted solutions to GitHub.</h1>
-    <p class="intro">Connect a GitHub repository. New submissions will land in date and problem folders automatically.</p>
+    <header class="hero">
+      <div class="brand" aria-label="AlgoNest logo">
+        <img src="images/icon.png" alt="AlgoNest logo" class="logo">
+      </div>
+      <div>
+        <p class="eyebrow">ALGONEST</p>
+        <h1>Save accepted submissions to GitHub.</h1>
+      </div>
+    </header>
+    <p class="intro">Choose a repository once. AlgoNest keeps your accepted LeetCode submissions organized automatically.</p>
     <form id="settings-form">
       <fieldset>
         <legend>GitHub destination</legend>
         <label>Repository<select name="githubRepo" required disabled><option value="">Sign in to load repositories</option></select></label>
         <label>Branch<select name="githubBranch" required disabled><option value="">Select a repository first</option></select></label>
+        <label class="check"><input name="commitOnlyAccepted" type="checkbox"> Commit only accepted submissions</label>
       </fieldset>
-      <label class="check"><input name="commitOnlyAccepted" type="checkbox"> Commit only accepted submissions</label>
-      <p class="auth-help">GitHub OAuth is already configured. After you click sign in, enter the temporary verification code shown here in the GitHub tab that opens.</p>
-      <button id="github-auth" type="button">Sign in with GitHub</button>
+      <p id="auth-help" class="auth-help">GitHub OAuth is already configured. After you click sign in, enter the temporary verification code shown here in the GitHub tab that opens.</p>
+      <div class="actions">
+        <button id="github-auth" type="button">Connect GitHub</button>
+        <button id="save-settings" type="submit" hidden disabled>Save</button>
+        <button id="github-logout" class="secondary" type="button" hidden>Disconnect GitHub</button>
+      </div>
       <p id="verification-code" class="verification-code" hidden>Enter this code on GitHub: <code></code></p>
       <p id="status" role="status"></p>
     </form>

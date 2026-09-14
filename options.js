@@ -12,10 +12,17 @@
   var form = document.getElementById('settings-form');
   var status = document.getElementById('status');
   var authButton = document.getElementById('github-auth');
+  var saveButton = document.getElementById('save-settings');
+  var logoutButton = document.getElementById('github-logout');
+  var authHelp = document.getElementById('auth-help');
   var verificationCode = document.getElementById('verification-code');
   var repositoryField = form.elements.githubRepo;
   var branchField = form.elements.githubBranch;
   var destinationFieldset = form.querySelector('fieldset');
+
+  function updateSaveButton() {
+    saveButton.disabled = !repositoryField.value || !branchField.value;
+  }
 
   function setStatus(message) {
     status.textContent = message;
@@ -28,11 +35,15 @@
 
   function updateAuthUi(isSignedIn) {
     authButton.hidden = isSignedIn;
+    saveButton.hidden = !isSignedIn;
+    logoutButton.hidden = !isSignedIn;
+    authHelp.hidden = isSignedIn;
     if (destinationFieldset) {
       destinationFieldset.hidden = !isSignedIn;
     }
     repositoryField.disabled = !isSignedIn;
     branchField.disabled = !isSignedIn;
+    updateSaveButton();
   }
 
   function postForm(url, values) {
@@ -181,7 +192,8 @@
       setStatus('Connected to GitHub. Loading repositories...');
       loadRepositories(settings.githubOwner + '/' + settings.githubRepo, settings.githubBranch)
         .then(function () {
-          setStatus('Connected to GitHub. Choose a repository and branch.');
+          updateSaveButton();
+          setStatus('Choose a repository and branch, then click Save.');
         })
         .catch(function (error) { setStatus(error.message); });
     }
@@ -197,12 +209,29 @@
         setStatus('Connected to GitHub. Loading repositories...');
         return loadRepositories(repositoryField.value, branchField.value);
       })
-      .then(function () { setStatus('Connected to GitHub. Choose a repository and branch.'); })
+      .then(function () {
+        updateSaveButton();
+        setStatus('Choose a repository and branch, then click Save.');
+      })
       .catch(function (error) {
         setVerificationCode('');
         setStatus(error.message);
       })
       .then(function () { authButton.disabled = false; });
+  });
+
+  logoutButton.addEventListener('click', function () {
+    logoutButton.disabled = true;
+    chrome.storage.local.remove(['githubToken', 'githubOwner', 'githubRepo', 'githubBranch'])
+      .then(function () {
+        repositoryField.replaceChildren(new Option('Sign in to load repositories', ''));
+        branchField.replaceChildren(new Option('Select a repository first', ''));
+        updateAuthUi(false);
+        setVerificationCode('');
+        setStatus('GitHub disconnected from AlgoNest.');
+      })
+      .catch(function (error) { setStatus(error.message); })
+      .then(function () { logoutButton.disabled = false; });
   });
 
   repositoryField.addEventListener('change', function () {
@@ -211,13 +240,34 @@
     branchField.disabled = true;
     chrome.storage.local.set({ githubOwner: parts[0], githubRepo: parts[1] })
       .then(function () { return loadBranches(branchField.value); })
-      .then(function () { setStatus('Repository selected. Choose a branch.'); })
+      .then(updateSaveButton)
       .catch(function (error) { setStatus(error.message); })
       .then(function () { repositoryField.disabled = false; });
   });
 
   branchField.addEventListener('change', function () {
-    chrome.storage.local.set({ githubBranch: branchField.value });
+    chrome.storage.local.set({ githubBranch: branchField.value })
+      .then(updateSaveButton)
+      .catch(function (error) { setStatus(error.message); });
+  });
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (!repositoryField.value || !branchField.value) return;
+    saveButton.disabled = true;
+    var parts = repositoryField.value.split('/');
+    chrome.storage.local.set({
+      githubOwner: parts[0],
+      githubRepo: parts[1],
+      githubBranch: branchField.value,
+      commitOnlyAccepted: form.elements.commitOnlyAccepted.checked
+    }).then(function () {
+      setStatus('Settings saved successfully.');
+      setTimeout(function () { window.close(); }, 800);
+    }).catch(function (error) {
+      setStatus(error.message);
+      updateSaveButton();
+    });
   });
 
   form.elements.commitOnlyAccepted.addEventListener('change', function () {

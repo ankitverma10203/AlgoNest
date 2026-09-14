@@ -46,12 +46,15 @@ The extension already includes AlgoNest's public GitHub OAuth client ID. You do 
 4. Enter the temporary verification code shown on the options page in the GitHub tab that opens.
 5. Approve the requested `repo` scope.
 6. Select the destination repository and branch.
+6. Confirm that the options page shows `Branch selected: <branch>.` after the branch is saved.
+
+To disconnect GitHub from AlgoNest, open the options page and click **Disconnect GitHub**. This removes the locally stored token and destination settings; it does not sign the user out of GitHub in the browser.
 
 ### For maintainers
 
 To distribute a fork under a different GitHub OAuth App, create one OAuth App, enable **Device Flow**, and replace `GITHUB_OAUTH_CLIENT_ID` in `options.js`. The client ID may be included in the extension, but never include or share the OAuth app's client secret.
 
-The selected repository and branch are saved in `chrome.storage.local`. The GitHub access token is also stored locally by the extension and is sent only to GitHub API endpoints.
+The selected repository and branch are saved in `chrome.storage.local`. After a branch is saved, the options page confirms the exact selected branch instead of continuing to show the repository setup prompt. The GitHub access token is also stored locally by the extension and is sent only to GitHub API endpoints.
 
 ### Authentication scope
 
@@ -165,6 +168,8 @@ Useful messages include the stored repository settings, GitHub lookup status, Gi
 manifest.json                  Extension metadata and permissions
 options.html / options.js      GitHub authentication and destination settings
 options.css                    Options page styling
+popup.html / popup.js          Compact extension popup and settings launcher
+popup.css                      Popup styling
 privacy.html                   GitHub Pages-ready privacy policy
 scripts/language-config.js     Shared language aliases and extensions
 scripts/site-adapters.js       LeetCode adapter and data normalization

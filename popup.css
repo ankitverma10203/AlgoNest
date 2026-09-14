@@ -1,0 +1,35 @@
+:root {
+  color-scheme: dark;
+  --ink: #f8fafc;
+  --muted: #a8b3c7;
+  --panel: #121926;
+  --line: rgba(255, 255, 255, .1);
+  --accent: #ff7758;
+  --success: #57d39b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 340px;
+  margin: 0;
+  color: var(--ink);
+  background: radial-gradient(circle at top right, #313c65 0, #1a2235 38%, #121926 100%);
+  font: 14px/1.45 Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.popup { padding: 22px; }
+.header { display: flex; gap: 12px; align-items: center; }
+.logo { width: 42px; height: 42px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, .25); }
+.eyebrow { margin: 0 0 2px; color: var(--accent); font-size: 20px; font-weight: 800; letter-spacing: .14em; }
+h1 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
+
+.status-card { display: flex; gap: 11px; align-items: flex-start; margin: 22px 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7, 12, 23, .32); }
+.status-dot { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #dca94b; box-shadow: 0 0 0 4px rgba(220, 169, 75, .13); }
+.status-dot.connected { background: var(--success); box-shadow: 0 0 0 4px rgba(87, 211, 155, .13); }
+.status-title { margin: 0; font-weight: 700; }
+.status-detail { margin: 3px 0 0; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+
+button { width: 100%; padding: 11px 14px; border: 0; border-radius: 10px; color: #1c1620; background: var(--accent); font: inherit; font-weight: 800; cursor: pointer; }
+button:hover { background: #ff927a; }
+.hint { margin: 13px 2px 0; color: var(--muted); font-size: 11px; }

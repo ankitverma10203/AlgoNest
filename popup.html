@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlgoNest</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup">
+    <header class="header">
+      <img src="images/icon.png" alt="AlgoNest" class="logo">
+      <div>
+        <p class="eyebrow">ALGONEST</p>
+        <h1>Submission Sync</h1>
+      </div>
+    </header>
+
+    <section class="status-card" aria-live="polite">
+      <span id="connection-dot" class="status-dot" aria-hidden="true"></span>
+      <div>
+        <p id="connection-status" class="status-title">Checking GitHub connection…</p>
+        <p id="destination" class="status-detail">Please wait</p>
+      </div>
+    </section>
+
+    <button id="open-settings" type="button">Open settings</button>
+    <p class="hint">GitHub sign-in opens in a persistent settings tab, so it stays open while you approve access.</p>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
