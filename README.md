@@ -165,12 +165,15 @@ Useful messages include the stored repository settings, GitHub lookup status, Gi
 manifest.json                  Extension metadata and permissions
 options.html / options.js      GitHub authentication and destination settings
 options.css                    Options page styling
+privacy.html                   GitHub Pages-ready privacy policy
 scripts/language-config.js     Shared language aliases and extensions
 scripts/site-adapters.js       LeetCode adapter and data normalization
 scripts/content.js             DOM capture and message handoff
 scripts/background.js          GitHub commit pipeline and notifications
 images/icon.png                Extension and notification icon
 ```
+
+For architecture, authentication, submission-sync behavior, and file-level responsibilities, see [Implementation details](docs/implementation.md).
 
 ## Privacy and security notes
 
