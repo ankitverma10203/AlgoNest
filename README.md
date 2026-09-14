@@ -71,6 +71,14 @@ The current OAuth flow requests the GitHub `repo` scope. Selecting one repositor
 
 When **Commit only accepted submissions** is enabled, non-accepted results are skipped. A successful commit produces a Chrome notification and a console message containing the repository, branch, and path.
 
+## Support and project links
+
+The extension popup and options page include links to:
+
+- [Report a bug](https://github.com/ankitverma10203/AlgoNest/issues/new) by opening a pre-addressed GitHub issue form.
+- [AlgoNest on GitHub](https://github.com/ankitverma10203/AlgoNest) for the source repository.
+- [Ankit Verma's GitHub profile](https://github.com/ankitverma10203) for the project author credit.
+
 ## GitHub file layout
 
 Files are written using this layout:

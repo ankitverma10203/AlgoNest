@@ -17,7 +17,7 @@ Options page → GitHub device authorization → local extension storage
 | `options.html` | Contains the GitHub sign-in, temporary verification-code display, repository selector, branch selector, and accepted-only setting. |
 | `options.css` | Styles the options page. |
 | `options.js` | Runs GitHub OAuth device authorization, displays the temporary user code, stores the access token locally, loads repositories and branches, and saves the selected destination. |
-| `popup.html` / `popup.js` | Shows the current GitHub connection and selected destination, then opens the persistent options page for setup or changes. |
+| `popup.html` / `popup.js` | Shows the current GitHub connection and selected destination, opens the persistent options page for setup or changes, and provides project support links. |
 | `popup.css` | Styles the compact extension popup. |
 | `scripts/language-config.js` | Defines the shared language-alias-to-file-extension mapping. |
 | `scripts/site-adapters.js` | Confirms that the active page is LeetCode and exposes general site-adapter helpers. Its `parseSubmission()` helper is reserved for a future API/message-based flow and is not used by the current DOM-capture flow. |
@@ -36,6 +36,10 @@ Options page → GitHub device authorization → local extension storage
 6. It uses that token to fetch repositories and branches. Selecting a repository stores its owner and name locally; changing the branch stores the selected branch and updates the options-page status after persistence succeeds.
 
 The token belongs to the GitHub account that approved the device code. The selected repository may be owned by the user or by an organization the user can access. The requested `repo` scope is broader than the one repository selected in AlgoNest; the extension itself writes only to the selected repository.
+
+## Support links
+
+The popup and options page link to the AlgoNest GitHub repository, the repository's new-issue form for bug reports, and the author's GitHub profile. These links open in a new browser tab and do not require GitHub authentication until the user submits an issue.
 
 ## Submission capture and sync
 
