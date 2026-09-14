@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "AlgoNest",
 	"version": "0.1.0",
-	"description": "Commit accepted coding submissions to a configurable GitHub repository.",
+	"description": "Save accepted LeetCode submissions to your chosen GitHub repository, organized by date and problem.",
 	"permissions": ["storage", "notifications"],
 	"host_permissions": [
 		"https://leetcode.com/*",
