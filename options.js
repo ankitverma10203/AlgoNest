@@ -51,6 +51,18 @@
     updateSaveButton();
   }
 
+  function showSavedDestination(settings) {
+    if (!settings.githubOwner || !settings.githubRepo) return;
+    var repository = settings.githubOwner + '/' + settings.githubRepo;
+    repositoryField.replaceChildren(new Option(repository, repository));
+    repositoryField.value = repository;
+    if (settings.githubBranch) {
+      branchField.replaceChildren(new Option(settings.githubBranch, settings.githubBranch));
+      branchField.value = settings.githubBranch;
+    }
+    updateSaveButton();
+  }
+
   function postForm(url, values) {
     return fetch(url, {
       method: 'POST',
@@ -208,6 +220,7 @@
     });
     updateAuthUi(Boolean(settings.githubToken));
     if (settings.githubToken) {
+      showSavedDestination(settings);
       setStatus('Connected to GitHub. Loading repositories...');
       loadRepositories(settings.githubOwner + '/' + settings.githubRepo, settings.githubBranch)
         .then(function () {
