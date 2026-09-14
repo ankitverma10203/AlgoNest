@@ -102,10 +102,11 @@ importScripts('language-config.js');
       codeLength: submission && submission.code ? submission.code.length : 0
     });
     return getSettings().then(function (settings) {
+      var branch = settings.githubBranch || 'main';
       console.log('AlgoNest: GitHub settings loaded.', {
         owner: settings.githubOwner || '(missing)',
         repo: settings.githubRepo || '(missing)',
-        branch: settings.githubBranch || '(missing)',
+        branch: branch,
         hasToken: Boolean(settings.githubToken)
       });
       if (!settings.githubOwner || !settings.githubRepo || !settings.githubToken) {
@@ -136,19 +137,19 @@ importScripts('language-config.js');
 
       console.log('AlgoNest: checking whether GitHub files already exist.', { path: path, problemFile: problemFile });
 
-      return fetch(problemEndpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers })
+      return fetch(problemEndpoint + '?ref=' + encodeURIComponent(branch), { headers: headers })
         .then(function (response) {
           if (response.status === 404) {
             return writeFile(problemEndpoint, headers, {
               message: 'Add ' + problemFile,
               content: encodeContent(buildProblemReadme(submission)),
-              branch: settings.githubBranch
+              branch: branch
             });
           }
           if (!response.ok) throw new Error('GitHub problem-file lookup failed (' + response.status + ').');
         })
         .then(function () {
-          return fetch(endpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers });
+          return fetch(endpoint + '?ref=' + encodeURIComponent(branch), { headers: headers });
         })
         .then(function (existing) {
           if (existing.status === 404) return null;
@@ -159,7 +160,7 @@ importScripts('language-config.js');
           var body = {
             message: 'Add ' + path,
             content: encodeContent(submission.code),
-            branch: settings.githubBranch
+            branch: branch
           };
           if (existing && existing.sha) body.sha = existing.sha;
           console.log('AlgoNest: writing submission to GitHub.', {
@@ -172,7 +173,7 @@ importScripts('language-config.js');
           return {
             path: path,
             repository: settings.githubOwner + '/' + settings.githubRepo,
-            branch: settings.githubBranch
+            branch: branch
           };
         });
     });

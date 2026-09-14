@@ -3,11 +3,20 @@
 
   var button = document.getElementById('open-settings');
   var status = document.getElementById('connection-status');
+  var destinationLabel = document.getElementById('destination-label');
   var destination = document.getElementById('destination');
+  var destinationMarker = document.getElementById('destination-marker');
   var dot = document.getElementById('connection-dot');
 
   function setConnected(connected) {
     dot.classList.toggle('connected', connected);
+  }
+
+  function setDestination(message, markerState) {
+    destination.textContent = message;
+    destination.title = message;
+    destinationMarker.hidden = !markerState;
+    destinationMarker.classList.toggle('connected', markerState === 'connected');
   }
 
   chrome.storage.local.get({
@@ -22,20 +31,26 @@
 
     if (authenticated && destinationConfigured) {
       status.textContent = 'GitHub connected';
-      destination.textContent = settings.githubOwner + '/' + settings.githubRepo + ' · ' + settings.githubBranch;
+      status.classList.remove('selection-warning');
+      destinationLabel.textContent = 'Destination';
+      setDestination(settings.githubOwner + '/' + settings.githubRepo + ' · ' + settings.githubBranch, 'connected');
       button.textContent = 'Manage settings';
       return;
     }
 
     if (authenticated) {
       status.textContent = 'GitHub connected';
-      destination.textContent = 'Select a repository and branch in settings.';
+      status.classList.remove('selection-warning');
+      destinationLabel.textContent = 'Destination';
+      setDestination('Select a repository and branch in settings.', 'warning');
       button.textContent = 'Manage settings';
       return;
     }
 
     status.textContent = 'GitHub not connected';
-    destination.textContent = 'Connect GitHub to start saving submissions.';
+    status.classList.remove('selection-warning');
+    destinationLabel.textContent = 'Setup';
+    setDestination('Connect GitHub to start saving submissions.', '');
     button.textContent = 'Connect GitHub';
   });
 

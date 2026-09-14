@@ -126,24 +126,31 @@
       var savedRepository = repositories.find(function (item) {
         return item.full_name === selectedRepository;
       });
+      var hasSavedSelection = Boolean(selectedRepository && selectedRepository.indexOf('/') > 0 && selectedRepository.split('/')[1]);
       var options = [new Option('Select a repository', '')].concat(repositories.map(function (repository) {
         var option = document.createElement('option');
         option.value = repository.full_name;
         option.textContent = repository.full_name;
         return option;
       }));
+      if (hasSavedSelection && !savedRepository) {
+        options.push(new Option(selectedRepository, selectedRepository));
+      }
       repositoryField.replaceChildren.apply(repositoryField, options);
-      repositoryField.value = savedRepository ? savedRepository.full_name : '';
+      repositoryField.value = hasSavedSelection && (savedRepository || options[options.length - 1].value === selectedRepository)
+        ? selectedRepository : '';
       repositoryField.disabled = false;
-      if (!savedRepository) {
+      if (!repositoryField.value) {
         branchField.replaceChildren(new Option('Select a repository first', ''));
         branchField.value = '';
         branchField.disabled = true;
-        return chrome.storage.local.remove(['githubOwner', 'githubRepo', 'githubBranch']);
+        return;
       }
+      var repositoryOwner = savedRepository ? savedRepository.owner.login : selectedRepository.split('/')[0];
+      var repositoryName = savedRepository ? savedRepository.name : selectedRepository.split('/')[1];
       return chrome.storage.local.set({
-        githubOwner: savedRepository.owner.login,
-        githubRepo: savedRepository.name
+        githubOwner: repositoryOwner,
+        githubRepo: repositoryName
       }).then(function () {
         return loadBranches(selectedBranch);
       });

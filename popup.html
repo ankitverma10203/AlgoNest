@@ -17,10 +17,19 @@
     </header>
 
     <section class="status-card" aria-live="polite">
-      <span id="connection-dot" class="status-dot" aria-hidden="true"></span>
-      <div>
-        <p id="connection-status" class="status-title">Checking GitHub connection…</p>
-        <p id="destination" class="status-detail">Please wait</p>
+      <div class="status-row">
+        <span id="connection-dot" class="status-dot" aria-hidden="true"></span>
+        <div class="status-content">
+          <span class="status-label">GitHub connection</span>
+          <p id="connection-status" class="status-title">Checking GitHub connection…</p>
+        </div>
+      </div>
+      <div class="status-row destination-row">
+        <span id="destination-marker" class="destination-marker" aria-hidden="true" hidden></span>
+        <div class="status-content">
+          <span id="destination-label" class="status-label">Destination</span>
+          <p class="status-detail"><span id="destination">Please wait</span></p>
+        </div>
       </div>
     </section>
 

@@ -24,11 +24,16 @@ body {
 .eyebrow { margin: 0 0 2px; color: var(--accent); font-size: 20px; font-weight: 800; letter-spacing: .14em; }
 h1 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
 
-.status-card { display: flex; gap: 11px; align-items: flex-start; margin: 22px 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7, 12, 23, .32); }
+.status-card { display: grid; gap: 13px; margin: 22px 0 16px; padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7, 12, 23, .32); }
+.status-row { display: flex; gap: 11px; align-items: flex-start; }
+.status-content { display: grid; min-width: 0; flex: 1 1 auto; gap: 2px; }
 .status-dot { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #dca94b; box-shadow: 0 0 0 4px rgba(220, 169, 75, .13); }
 .status-dot.connected { background: var(--success); box-shadow: 0 0 0 4px rgba(87, 211, 155, .13); }
-.status-title { margin: 0; font-weight: 700; }
-.status-detail { margin: 3px 0 0; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.status-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; line-height: 1.2; text-transform: uppercase; }
+.status-title, .status-detail { min-width: 0; margin: 0; font-weight: normal; line-height: 1.4; overflow-wrap: anywhere; word-break: normal; }
+.status-detail { color: var(--ink); font-size: 14px; }
+.destination-marker { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #f2c94c; box-shadow: 0 0 0 4px rgba(242, 201, 76, .14); }
+.destination-marker.connected { background: var(--success); box-shadow: 0 0 0 4px rgba(87, 211, 155, .13); }
 
 button { width: 100%; padding: 11px 14px; border: 0; border-radius: 10px; color: #1c1620; background: var(--accent); font: inherit; font-weight: 800; cursor: pointer; }
 button:hover { background: #ff927a; }
