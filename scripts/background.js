@@ -40,11 +40,27 @@ importScripts('language-config.js');
 
   function buildPath(submission) {
     var date = new Date().toISOString().slice(0, 10);
-    var number = cleanSegment(submission.problemNumber, 'problem');
-    var title = cleanSegment(submission.problemSlug, 'untitled-problem');
+    var problemFolder = cleanSegment(submission.problemSlug, 'untitled-problem');
     var id = cleanSegment(submission.submissionId, 'submission');
     var extension = extensionFor(submission.language);
-    return [date, number + '-' + title, id + (extension ? '.' + extension : '')].join('/');
+    return [date, problemFolder, id + (extension ? '.' + extension : '')].join('/');
+  }
+
+  function buildProblemFile(path) {
+    return path.slice(0, path.lastIndexOf('/') + 1) + 'problem.md';
+  }
+
+  function writeFile(endpoint, headers, body) {
+    return fetch(endpoint, {
+      method: 'PUT',
+      headers: headers,
+      body: JSON.stringify(body)
+    }).then(function (response) {
+      if (response.ok) return;
+      return response.json().catch(function () { return {}; }).then(function (error) {
+        throw new Error((error.message || 'GitHub commit failed') + ' (' + response.status + ').');
+      });
+    });
   }
 
   function notify(title, message) {
@@ -90,9 +106,11 @@ importScripts('language-config.js');
       }
 
       var path = buildPath(submission);
-      var endpoint = 'https://api.github.com/repos/' + encodeURIComponent(settings.githubOwner) +
-        '/' + encodeURIComponent(settings.githubRepo) + '/contents/' +
-        path.split('/').map(encodeURIComponent).join('/');
+      var apiRoot = 'https://api.github.com/repos/' + encodeURIComponent(settings.githubOwner) +
+        '/' + encodeURIComponent(settings.githubRepo) + '/contents/';
+      var endpoint = apiRoot + path.split('/').map(encodeURIComponent).join('/');
+      var problemFile = buildProblemFile(path);
+      var problemEndpoint = apiRoot + problemFile.split('/').map(encodeURIComponent).join('/');
       var headers = {
         Accept: 'application/vnd.github+json',
         Authorization: 'Bearer ' + settings.githubToken,
@@ -100,14 +118,28 @@ importScripts('language-config.js');
         'Content-Type': 'application/json'
       };
 
-      console.log('AlgoNest: checking whether GitHub file already exists.', endpoint);
+      console.log('AlgoNest: checking whether GitHub files already exist.', { path: path, problemFile: problemFile });
 
-      return fetch(endpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers })
+      return fetch(problemEndpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers })
         .then(function (response) {
-          console.log('AlgoNest: GitHub lookup response:', response.status);
-          if (response.status === 404) return null;
-          if (!response.ok) throw new Error('GitHub lookup failed (' + response.status + ').');
-          return response.json();
+          if (response.status === 404) {
+            var problemUrl = submission.problemUrl ||
+              'https://leetcode.com/problems/' + encodeURIComponent(submission.problemSlug || '') + '/';
+            return writeFile(problemEndpoint, headers, {
+              message: 'Add ' + problemFile,
+              content: encodeContent('[LeetCode problem](' + problemUrl + ')\n'),
+              branch: settings.githubBranch
+            });
+          }
+          if (!response.ok) throw new Error('GitHub problem-file lookup failed (' + response.status + ').');
+        })
+        .then(function () {
+          return fetch(endpoint + '?ref=' + encodeURIComponent(settings.githubBranch), { headers: headers });
+        })
+        .then(function (existing) {
+          if (existing.status === 404) return null;
+          if (!existing.ok) throw new Error('GitHub submission lookup failed (' + existing.status + ').');
+          return existing.json();
         })
         .then(function (existing) {
           var body = {
@@ -120,19 +152,9 @@ importScripts('language-config.js');
             path: path,
             updatingExistingFile: Boolean(body.sha)
           });
-          return fetch(endpoint, {
-            method: 'PUT',
-            headers: headers,
-            body: JSON.stringify(body)
-          });
+          return writeFile(endpoint, headers, body);
         })
-        .then(function (response) {
-          console.log('AlgoNest: GitHub write response:', response.status);
-          if (!response.ok) {
-            return response.json().catch(function () { return {}; }).then(function (body) {
-              throw new Error((body.message || 'GitHub commit failed') + ' (' + response.status + ').');
-            });
-          }
+        .then(function () {
           return {
             path: path,
             repository: settings.githubOwner + '/' + settings.githubRepo,

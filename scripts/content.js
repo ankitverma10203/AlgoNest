@@ -18,18 +18,25 @@
   var statusCheckAttempts = 0;
 
   function readCodeFromPage() {
-    var selectors = [
-      'textarea:not([aria-hidden="true"])',
-      '.monaco-editor .view-lines',
-      '.CodeMirror-code',
-      'pre'
-    ];
+    var textarea = document.querySelector('textarea:not([aria-hidden="true"])');
+    if (textarea && textarea.value && textarea.value.trim()) return textarea.value.trim();
 
-    for (var i = 0; i < selectors.length; i += 1) {
-      var element = document.querySelector(selectors[i]);
-      var value = element && ('value' in element ? element.value : element.textContent);
-      if (value && value.trim()) return value.trim();
+    var lineSelectors = [
+      '.monaco-editor .view-lines > .view-line',
+      '.CodeMirror-code > pre',
+      '.CodeMirror-code .CodeMirror-line'
+    ];
+    for (var i = 0; i < lineSelectors.length; i += 1) {
+      var lines = document.querySelectorAll(lineSelectors[i]);
+      if (!lines.length) continue;
+      var code = Array.prototype.map.call(lines, function (line) {
+        return line.textContent || '';
+      }).join('\n').trim();
+      if (code) return code;
     }
+
+    var pre = document.querySelector('pre');
+    if (pre && pre.textContent && pre.textContent.trim()) return pre.textContent.trim();
 
     return '';
   }
@@ -57,24 +64,17 @@
     return '';
   }
 
-  function readProblemMeta() {
-    var slugMatch = /\/problems\/([^/]+)/.exec(window.location.pathname || '');
-    var slug = slugMatch ? slugMatch[1] : '';
-    var title = document.title || '';
-    var cleanedTitle = title.replace(/\s*[-|].*$/, '').trim();
-
-    return {
-      problemSlug: slug,
-      problemNumber: slug,
-      problemTitle: cleanedTitle || slug || ''
-    };
+  function readProblemSlug() {
+    var match = /^\/problems\/([^/]+)/.exec(window.location.pathname || '');
+    return match ? match[1] : '';
   }
 
   function readLanguageFromPage() {
     var languages = globalThis.AlgoNestLanguageConfig || [];
     var elements = document.querySelectorAll(
-      'button[aria-haspopup="dialog"][aria-controls], select, [role="combobox"], button'
+      'button[aria-haspopup="dialog"], select, [role="combobox"]'
     );
+    var labels = [];
 
     for (var i = 0; i < elements.length; i += 1) {
       var element = elements[i];
@@ -82,9 +82,11 @@
         ? element.value
         : (element.innerText || element.textContent);
       var normalized = String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      if (normalized) labels.push(normalized);
       for (var j = 0; j < languages.length; j += 1) {
         var alias = languages[j].aliases.find(function (item) {
-          return normalized.indexOf(item) !== -1;
+          var escaped = item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          return new RegExp('(^|\\s)' + escaped + '(?=\\s|$)', 'i').test(normalized);
         });
         if (alias) {
           console.log('AlgoNest: language detected.', {
@@ -96,7 +98,7 @@
       }
     }
 
-    console.warn('AlgoNest: language could not be detected.');
+    console.warn('AlgoNest: language could not be detected.', { labels: labels });
     return 'unknown';
   }
 
@@ -120,9 +122,9 @@
 
     statusCheckAttempts = 0;
 
-    var meta = readProblemMeta();
+    var problemSlug = readProblemSlug();
     var language = readLanguageFromPage();
-    var submissionKey = meta.problemSlug + '|' + status + '|' + code;
+    var submissionKey = problemSlug + '|' + status + '|' + code;
     if (submissionKey === lastSubmissionKey) {
       console.log('AlgoNest: duplicate submission ignored.');
       return;
@@ -131,9 +133,8 @@
 
     var payload = {
       submissionId: String(Date.now()),
-      problemSlug: meta.problemSlug,
-      problemNumber: meta.problemNumber,
-      problemTitle: meta.problemTitle,
+      problemSlug: problemSlug,
+      problemUrl: window.location.origin + '/problems/' + problemSlug + '/',
       code: code,
       language: language,
       status: status
@@ -146,7 +147,7 @@
       }
 
       console.log('AlgoNest: sending submission to background.', {
-        problemSlug: meta.problemSlug,
+        problemSlug: problemSlug,
         status: status,
         language: language,
         codeLength: code.length
