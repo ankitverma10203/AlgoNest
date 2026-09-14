@@ -94,6 +94,26 @@ importScripts('language-config.js');
     }
   }
 
+  function notifyAuthenticationCode(code) {
+    var notification = chrome.notifications.create('algonest-github-auth-code', {
+      type: 'basic',
+      iconUrl: chrome.runtime.getURL('images/icon.png'),
+      title: 'AlgoNest GitHub sign-in code',
+      message: 'Code: ' + code + '. Click to return to the AlgoNest options page.'
+    });
+    if (notification && typeof notification.catch === 'function') {
+      notification.catch(function (error) {
+        console.warn('AlgoNest: authentication notification could not be displayed.', error);
+      });
+    }
+  }
+
+  chrome.notifications.onClicked.addListener(function (notificationId) {
+    if (notificationId !== 'algonest-github-auth-code') return;
+    chrome.notifications.clear(notificationId);
+    chrome.runtime.openOptionsPage();
+  });
+
   function commitSubmission(submission) {
     console.log('AlgoNest: commit requested.', {
       submissionId: submission && submission.submissionId,
@@ -179,6 +199,10 @@ importScripts('language-config.js');
   }
 
   chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message && message.type === 'github-auth-code') {
+      notifyAuthenticationCode(message.code);
+      return;
+    }
     if (!message || message.type !== 'submission-ready') return;
     console.log('AlgoNest: submission-ready message received.', {
       senderTab: sender && sender.tab ? sender.tab.id : null,

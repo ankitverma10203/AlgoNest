@@ -148,6 +148,7 @@
     }).then(function (device) {
       return chrome.tabs.create({ url: device.verification_uri }).then(function () {
         setVerificationCode(device.user_code);
+        chrome.runtime.sendMessage({ type: 'github-auth-code', code: device.user_code });
         setStatus('Enter the verification code above on GitHub to approve AlgoNest.');
         var interval = Math.max(Number(device.interval) || 5, 5) * 1000;
         var attempts = 0;
