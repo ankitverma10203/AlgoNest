@@ -20,6 +20,22 @@
     return normalize(language) || 'txt';
   }
 
+  function findNestedValue(node, candidates) {
+    if (!node || typeof node !== 'object') return '';
+    var keys = Object.keys(node);
+    for (var i = 0; i < keys.length; i += 1) {
+      var key = keys[i];
+      if (candidates.indexOf(key) !== -1 && node[key] !== undefined && node[key] !== null && node[key] !== '') {
+        return node[key];
+      }
+      if (key === 'data' || key === 'submission' || key === 'result' || key === 'body' || key === 'response') {
+        var nested = findNestedValue(node[key], candidates);
+        if (nested !== '') return nested;
+      }
+    }
+    return '';
+  }
+
   var leetcode = {
     id: 'leetcode',
     matches: function (url) {
@@ -27,26 +43,31 @@
     },
     parseSubmission: function (message) {
       var response = message && message.response;
-      var submissionId = response && (response.submission_id || response.submissionId);
+      if (!response || typeof response !== 'object') return null;
+
+      var submissionId = response.submission_id || response.submissionId ||
+        findNestedValue(response, ['submission_id', 'submissionId']) || '';
       if (!submissionId) return null;
+
+      var code = response.code || response.solution || response.source || response.submission_code ||
+        findNestedValue(response, ['code', 'solution', 'source', 'submission_code', 'code_snippet', 'text', 'answer']) || '';
+      var language = response.lang || response.language ||
+        findNestedValue(response, ['lang', 'language']) || '';
+      var status = response.status_display || response.status ||
+        findNestedValue(response, ['status_display', 'status']) || 'Accepted';
+      var problemSlug = response.question_slug || response.question_title_slug ||
+        findNestedValue(response, ['question_slug', 'question_title_slug']) || '';
+      var problemNumber = response.question_id || findNestedValue(response, ['question_id']) || '';
+      var problemTitle = response.question_title || findNestedValue(response, ['question_title']) || '';
+
       return {
         submissionId: String(submissionId),
-        detailUrl: 'https://leetcode.com/api/submissions/' + encodeURIComponent(submissionId) + '/',
-        problemSlug: normalize(response.question_slug || response.question_title_slug || ''),
-        problemNumber: response.question_id || '',
-        problemTitle: response.question_title || ''
-      };
-    },
-    parseDetail: function (detail) {
-      var result = detail && (detail.submission || detail);
-      if (!result || !result.code) return null;
-      return {
-        code: result.code,
-        language: result.lang || result.language || '',
-        status: result.status_display || result.status || '',
-        problemSlug: normalize(result.question_title_slug || result.question_slug || ''),
-        problemNumber: result.question_id || '',
-        problemTitle: result.question_title || ''
+        problemSlug: normalize(problemSlug),
+        problemNumber: problemNumber,
+        problemTitle: problemTitle,
+        code: code,
+        language: language,
+        status: status
       };
     }
   };

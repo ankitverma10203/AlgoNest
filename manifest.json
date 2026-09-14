@@ -30,14 +30,8 @@
 	"content_scripts": [
 		{
 			"matches": ["https://leetcode.com/*"],
-			"js": ["scripts/site-adapters.js", "scripts/content.js"],
+			"js": ["scripts/language-config.js", "scripts/site-adapters.js", "scripts/content.js"],
 			"run_at": "document_start"
-		}
-	],
-	"web_accessible_resources": [
-		{
-			"resources": ["scripts/page-hook.js"],
-			"matches": ["https://leetcode.com/*"]
 		}
 	]
 }
