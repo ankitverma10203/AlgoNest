@@ -16,7 +16,6 @@ AlgoNest does not call the LeetCode submissions API or download submission detai
 - Google Chrome or another Chromium browser with Manifest V3 support
 - A logged-in LeetCode account
 - A GitHub account
-- A GitHub OAuth App client ID for local development
 - A GitHub repository where the solution files should be stored
 
 ## Install locally
@@ -33,29 +32,24 @@ After changing extension files, click **Reload** for AlgoNest on `chrome://exten
 
 AlgoNest uses GitHub OAuth device flow.
 
-### Create an OAuth App
+### For users
 
-1. Open GitHub **Settings**.
-2. Go to **Developer settings** > **OAuth Apps**.
-3. Select **New OAuth App**.
-4. Enter an application name, such as `AlgoNest Local`.
-5. Set the homepage URL to any valid URL, such as `https://github.com`.
-6. Create the application and copy its **Client ID**.
+The extension already includes AlgoNest's public GitHub OAuth client ID. You do not need to create an OAuth App or supply a client ID.
 
-### Configure the extension
-
-1. Open `options.js`.
-2. Replace the value of `GITHUB_OAUTH_CLIENT_ID` with your OAuth App client ID.
-3. Reload AlgoNest from `chrome://extensions`.
-4. Open the extension options page:
+1. Reload AlgoNest from `chrome://extensions` after installing or updating it.
+2. Open the extension options page:
    - Go to `chrome://extensions`.
    - Find **AlgoNest** and click **Details**.
    - Click **Extension options**.
    - Alternatively, right-click the AlgoNest toolbar icon and choose **Options**.
-5. Click **Sign in with GitHub**.
-6. Follow the GitHub device-flow instructions in the new tab.
-7. Approve the requested `repo` scope.
-8. Select the destination repository and branch.
+3. Click **Sign in with GitHub**.
+4. Follow the GitHub device-flow instructions in the new tab.
+5. Approve the requested `repo` scope.
+6. Select the destination repository and branch.
+
+### For maintainers
+
+To distribute a fork under a different GitHub OAuth App, create one OAuth App, enable **Device Flow**, and replace `GITHUB_OAUTH_CLIENT_ID` in `options.js`. The client ID may be included in the extension, but never include or share the OAuth app's client secret.
 
 The selected repository and branch are saved in `chrome.storage.local`. The GitHub access token is also stored locally by the extension and is sent only to GitHub API endpoints.
 
