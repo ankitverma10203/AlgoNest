@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
-	"name": "AlgoNest",
-	"version": "0.1.2",
+	"name": "AlgoNest – LeetCode to GitHub Sync",
+	"version": "0.1.3",
 	"description": "Save accepted LeetCode submissions to your chosen GitHub repository, organized by date and problem.",
 	"permissions": ["storage", "notifications"],
 	"host_permissions": [
