@@ -51,6 +51,17 @@
     updateSaveButton();
   }
 
+  function handleGitHubResponse(response, operation) {
+    if (response.status === 401) {
+      return chrome.storage.local.remove('githubToken').then(function () {
+        updateAuthUi(false);
+        throw new Error('GitHub sign-in expired or was revoked. Sign in again.');
+      });
+    }
+    if (!response.ok) throw new Error(operation + ' (' + response.status + ').');
+    return Promise.resolve(response);
+  }
+
   function showSavedDestination(settings) {
     if (!settings.githubOwner || !settings.githubRepo) return;
     var repository = settings.githubOwner + '/' + settings.githubRepo;
@@ -99,8 +110,9 @@
         }
       });
     }).then(function (response) {
-      if (!response.ok) throw new Error('Could not load branches (' + response.status + ').');
-      return response.json();
+      return handleGitHubResponse(response, 'Could not load branches').then(function (validResponse) {
+        return validResponse.json();
+      });
     }).then(function (branches) {
       if (!branches.length) throw new Error('This repository has no branches.');
       branchField.replaceChildren.apply(branchField, branches.map(function (branch) {
@@ -131,8 +143,9 @@
         }
       });
     }).then(function (response) {
-      if (!response.ok) throw new Error('Could not load repositories (' + response.status + ').');
-      return response.json();
+      return handleGitHubResponse(response, 'Could not load repositories').then(function (validResponse) {
+        return validResponse.json();
+      });
     }).then(function (repositories) {
       if (!repositories.length) throw new Error('No repositories are available for this account.');
       var savedRepository = repositories.find(function (item) {

@@ -19,6 +19,23 @@
     destinationMarker.classList.toggle('connected', markerState === 'connected');
   }
 
+  function validateToken(token) {
+    return fetch('https://api.github.com/user', {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: 'Bearer ' + token,
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    }).then(function (response) {
+      if (response.status === 401) {
+        return chrome.storage.local.remove('githubToken').then(function () { return false; });
+      }
+      return response.ok;
+    }).catch(function () {
+      return true;
+    });
+  }
+
   chrome.storage.local.get({
     githubToken: '',
     githubOwner: '',
@@ -27,31 +44,34 @@
   }).then(function (settings) {
     var authenticated = Boolean(settings.githubToken);
     var destinationConfigured = Boolean(settings.githubOwner && settings.githubRepo && settings.githubBranch);
-    setConnected(authenticated);
+    return validateToken(settings.githubToken).then(function (tokenIsValid) {
+      authenticated = authenticated && tokenIsValid;
+      setConnected(authenticated);
 
-    if (authenticated && destinationConfigured) {
-      status.textContent = 'GitHub connected';
+      if (authenticated && destinationConfigured) {
+        status.textContent = 'GitHub connected';
+        status.classList.remove('selection-warning');
+        destinationLabel.textContent = 'Destination';
+        setDestination(settings.githubOwner + '/' + settings.githubRepo + ' · ' + settings.githubBranch, 'connected');
+        button.textContent = 'Manage settings';
+        return;
+      }
+
+      if (authenticated) {
+        status.textContent = 'GitHub connected';
+        status.classList.remove('selection-warning');
+        destinationLabel.textContent = 'Destination';
+        setDestination('Select a repository and branch in settings.', 'warning');
+        button.textContent = 'Manage settings';
+        return;
+      }
+
+      status.textContent = settings.githubToken ? 'GitHub sign-in expired' : 'GitHub not connected';
       status.classList.remove('selection-warning');
-      destinationLabel.textContent = 'Destination';
-      setDestination(settings.githubOwner + '/' + settings.githubRepo + ' · ' + settings.githubBranch, 'connected');
-      button.textContent = 'Manage settings';
-      return;
-    }
-
-    if (authenticated) {
-      status.textContent = 'GitHub connected';
-      status.classList.remove('selection-warning');
-      destinationLabel.textContent = 'Destination';
-      setDestination('Select a repository and branch in settings.', 'warning');
-      button.textContent = 'Manage settings';
-      return;
-    }
-
-    status.textContent = 'GitHub not connected';
-    status.classList.remove('selection-warning');
-    destinationLabel.textContent = 'Setup';
-    setDestination('Connect GitHub to start saving submissions.', '');
-    button.textContent = 'Connect GitHub';
+      destinationLabel.textContent = 'Setup';
+      setDestination('Sign in again to start saving submissions.', 'warning');
+      button.textContent = 'Sign in again';
+    });
   });
 
   button.addEventListener('click', function () {

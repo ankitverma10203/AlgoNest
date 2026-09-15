@@ -15,6 +15,16 @@ importScripts('language-config.js');
     return chrome.storage.local.get(defaults);
   }
 
+  function handleGitHubResponse(response, operation) {
+    if (response.status === 401) {
+      return chrome.storage.local.remove('githubToken').then(function () {
+        throw new Error('GitHub sign-in expired or was revoked. Open AlgoNest settings and sign in again.');
+      });
+    }
+    if (!response.ok) throw new Error(operation + ' (' + response.status + ').');
+    return response;
+  }
+
   function encodeContent(value) {
     return btoa(unescape(encodeURIComponent(value)));
   }
@@ -73,6 +83,7 @@ importScripts('language-config.js');
       body: JSON.stringify(body)
     }).then(function (response) {
       if (response.ok) return;
+      if (response.status === 401) return handleGitHubResponse(response, 'GitHub commit failed');
       return response.json().catch(function () { return {}; }).then(function (error) {
         throw new Error((error.message || 'GitHub commit failed') + ' (' + response.status + ').');
       });
@@ -146,15 +157,16 @@ importScripts('language-config.js');
               branch: branch
             });
           }
-          if (!response.ok) throw new Error('GitHub problem-file lookup failed (' + response.status + ').');
+          return handleGitHubResponse(response, 'GitHub problem-file lookup failed');
         })
         .then(function () {
           return fetch(endpoint + '?ref=' + encodeURIComponent(branch), { headers: headers });
         })
         .then(function (existing) {
           if (existing.status === 404) return null;
-          if (!existing.ok) throw new Error('GitHub submission lookup failed (' + existing.status + ').');
-          return existing.json();
+          return handleGitHubResponse(existing, 'GitHub submission lookup failed').then(function (response) {
+            return response.json();
+          });
         })
         .then(function (existing) {
           var body = {
