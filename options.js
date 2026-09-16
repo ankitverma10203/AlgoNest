@@ -231,9 +231,9 @@
       if (field.type === 'checkbox') field.checked = settings[key];
       else field.value = settings[key];
     });
+    showSavedDestination(settings);
     updateAuthUi(Boolean(settings.githubToken));
     if (settings.githubToken) {
-      showSavedDestination(settings);
       setStatus('Connected to GitHub. Loading repositories...');
       loadRepositories(settings.githubOwner + '/' + settings.githubRepo, settings.githubBranch)
         .then(function () {
@@ -252,7 +252,14 @@
       .then(function () {
         updateAuthUi(true);
         setStatus('Connected to GitHub. Loading repositories...');
-        return loadRepositories(repositoryField.value, branchField.value);
+        return chrome.storage.local.get({ githubOwner: '', githubRepo: '', githubBranch: 'main' });
+      })
+      .then(function (settings) {
+        var savedRepository = settings.githubOwner && settings.githubRepo
+          ? settings.githubOwner + '/' + settings.githubRepo
+          : repositoryField.value;
+        var savedBranch = settings.githubBranch || branchField.value;
+        return loadRepositories(savedRepository, savedBranch);
       })
       .then(function () {
         updateSaveButton();
