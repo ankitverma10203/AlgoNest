@@ -26,6 +26,8 @@ Options page → GitHub device authorization → local extension storage
 | `privacy.html` | Public privacy-policy page intended for GitHub Pages and the Chrome Web Store Privacy practices URL. |
 | `images/icon.png` | Used for the extension, options page, and notifications. |
 
+On a fresh install, the background service worker uses the `scripting` permission to initialize the content scripts in already-open LeetCode tabs. Normal page navigation still receives the scripts through the manifest's content-script declaration.
+
 ## Authentication and repository selection
 
 1. The user clicks **Sign in with GitHub** in the options page.

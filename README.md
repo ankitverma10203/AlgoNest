@@ -26,7 +26,7 @@ AlgoNest does not call the LeetCode submissions API or download submission detai
 4. Click **Load unpacked**.
 5. Select the project folder containing `manifest.json`.
 
-After changing extension files, click **Reload** for AlgoNest on `chrome://extensions`, then refresh any open LeetCode tabs. Content scripts already loaded in an open tab do not update automatically.
+After changing extension files, click **Reload** for AlgoNest on `chrome://extensions`. A fresh install initializes already-open LeetCode tabs; after updating extension files, refresh open LeetCode tabs so the latest content script is loaded.
 
 ## Configure GitHub authentication
 

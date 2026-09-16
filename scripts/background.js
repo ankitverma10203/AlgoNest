@@ -15,6 +15,26 @@ importScripts('language-config.js');
     return chrome.storage.local.get(defaults);
   }
 
+  function injectIntoOpenLeetCodeTabs() {
+    chrome.tabs.query({ url: ['https://leetcode.com/*'] }).then(function (tabs) {
+      tabs.forEach(function (tab) {
+        if (!tab.id) return;
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['scripts/language-config.js', 'scripts/site-adapters.js', 'scripts/content.js']
+        }).catch(function (error) {
+          console.warn('AlgoNest: could not initialize an open LeetCode tab.', error);
+        });
+      });
+    }).catch(function (error) {
+      console.warn('AlgoNest: could not find open LeetCode tabs.', error);
+    });
+  }
+
+  chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason === 'install') injectIntoOpenLeetCodeTabs();
+  });
+
   function handleGitHubResponse(response, operation) {
     if (response.status === 401) {
       return chrome.storage.local.remove('githubToken').then(function () {
