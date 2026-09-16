@@ -75,6 +75,7 @@ When **Commit only accepted submissions** is enabled, non-accepted results are s
 
 The extension popup and options page include links to:
 
+- [Install AlgoNest from the Chrome Web Store](https://chromewebstore.google.com/detail/kgiiibillccicheeeplpoijdlifpijep?utm_source=item-share-cb)
 - [Report a bug](https://github.com/ankitverma10203/AlgoNest/issues/new) by opening a pre-addressed GitHub issue form.
 - [AlgoNest on GitHub](https://github.com/ankitverma10203/AlgoNest) for the source repository.
 - [Ankit Verma's GitHub profile](https://github.com/ankitverma10203) for the project author credit.
