@@ -18,6 +18,10 @@ AlgoNest does not call the LeetCode submissions API or download submission detai
 - A GitHub account
 - A GitHub repository where the solution files should be stored
 
+## Install from the Chrome Web Store
+
+[Install AlgoNest from the Chrome Web Store](https://chromewebstore.google.com/detail/kgiiibillccicheeeplpoijdlifpijep?utm_source=item-share-cb)
+
 ## Install locally
 
 1. Clone or download this repository.
@@ -75,7 +79,6 @@ When **Commit only accepted submissions** is enabled, non-accepted results are s
 
 The extension popup and options page include links to:
 
-- [Install AlgoNest from the Chrome Web Store](https://chromewebstore.google.com/detail/kgiiibillccicheeeplpoijdlifpijep?utm_source=item-share-cb)
 - [Report a bug](https://github.com/ankitverma10203/AlgoNest/issues/new) by opening a pre-addressed GitHub issue form.
 - [AlgoNest on GitHub](https://github.com/ankitverma10203/AlgoNest) for the source repository.
 - [Ankit Verma's GitHub profile](https://github.com/ankitverma10203) for the project author credit.
