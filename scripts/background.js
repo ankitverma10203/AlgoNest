@@ -144,12 +144,12 @@ importScripts('language-config.js');
         throw new Error('Configure the GitHub destination and sign in with GitHub in the extension settings.');
       }
 
-      if (settings.commitOnlyAccepted && submission.status) {
+      if (settings.commitOnlyAccepted) {
         var normalizedStatus = String(submission.status || '').trim().toLowerCase();
-        var acceptedStatus = ['accepted', 'ac', 'accepted-without-optimization', 'accepted-like'];
+        var acceptedStatus = ['accepted', 'ac'];
         if (acceptedStatus.indexOf(normalizedStatus) === -1) {
-          console.log('AlgoNest: submission skipped because it was not accepted.', submission.status);
-          return { skipped: true, reason: 'Submission was not accepted: ' + submission.status };
+          console.log('AlgoNest: submission skipped because it was not confirmed accepted.', submission.status || '(missing)');
+          return { skipped: true, reason: 'Submission was not confirmed as accepted.' };
         }
       }
 

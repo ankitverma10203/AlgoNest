@@ -57,10 +57,6 @@
       }
     }
 
-    var pageText = document.body ? document.body.innerText : '';
-    var pageMatch = statusPattern.exec(pageText || '');
-    if (pageMatch) return pageMatch[0];
-
     return '';
   }
 
